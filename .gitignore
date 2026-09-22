@@ -216,3 +216,15 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Foundry
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+!contracts/lib/
+
+# Node
+node_modules/
+
+# SQLite
+*.db
