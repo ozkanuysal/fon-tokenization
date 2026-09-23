@@ -1,0 +1,57 @@
+# Whole stack on your machine: local chain, contract deployment, indexer API and the web app.
+#   docker compose up --build   ->   http://localhost:5173
+
+x-anvil-accounts: &anvil-accounts
+  # anvil's default dev accounts 0-3. These keys are public, never use them on a real network.
+  PRIVATE_KEY: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80" # gitleaks:allow
+  MANAGER_ADDRESS: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
+  INVESTOR_A_ADDRESS: "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC"
+  INVESTOR_B_ADDRESS: "0x90F79bf6EB2c4f870365E785982E1f101E93b906"
+
+services:
+  anvil:
+    image: ghcr.io/foundry-rs/foundry:v1.8.3
+    command: ["anvil --host 0.0.0.0 --block-time 2"]
+    ports: ["8545:8545"]
+    healthcheck:
+      test: cast block-number --rpc-url http://localhost:8545
+      interval: 2s
+      retries: 30
+
+  deploy:
+    image: ghcr.io/foundry-rs/foundry:v1.8.3
+    working_dir: /app/contracts
+    command: ["forge script script/Deploy.s.sol --rpc-url http://anvil:8545 --broadcast"]
+    environment: *anvil-accounts
+    volumes:
+      - ./contracts:/app/contracts
+    # Addresses are deterministic on a fresh anvil and the committed local.json already has
+    # them, so the file the script writes can be thrown away.
+    tmpfs:
+      - /app/deployments
+    depends_on:
+      anvil:
+        condition: service_healthy
+
+  backend:
+    build: ./backend
+    environment:
+      RPC_URL: http://anvil:8545
+      FUND_ADDRESS: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"
+      REGISTRY_ADDRESS: "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"
+      POLL_INTERVAL: 2
+      CORS_ORIGINS: '["http://localhost:5173"]'
+    ports: ["8000:8000"]
+    depends_on:
+      deploy:
+        condition: service_completed_successfully
+
+  web:
+    build:
+      context: .
+      dockerfile: web/Dockerfile
+      args:
+        VITE_NETWORK: local
+        VITE_BACKEND_URL: http://localhost:8000
+    ports: ["5173:80"]
+    depends_on: [backend]
