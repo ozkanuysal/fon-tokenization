@@ -6,6 +6,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {IInvestorRegistry} from "./interfaces/IInvestorRegistry.sol";
 
 /// @notice Fund share token. Investors subscribe with the payment asset at the current NAV
@@ -14,6 +15,7 @@ contract FundToken is ERC20, AccessControl, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
     bytes32 public constant MANAGER_ROLE = keccak256("MANAGER_ROLE");
+    uint256 private constant ONE_SHARE = 1e18;
 
     IERC20 public immutable asset;
     IInvestorRegistry public immutable registry;
@@ -49,23 +51,51 @@ contract FundToken is ERC20, AccessControl, ReentrancyGuard {
     }
 
     function subscribe(uint256 assets) external nonReentrant returns (uint256 shares) {
-        // TODO
+        shares = previewSubscribe(assets);
+        if (shares == 0) revert ZeroAmount();
+
+        // Minting first means an unapproved investor gets NotApprovedInvestor instead of an
+        // allowance error. If the payment fails the whole call reverts anyway.
+        _mint(msg.sender, shares);
+        // forge-lint: disable-next-line(reentrancy-events)
+        emit Subscribed(msg.sender, assets, shares, nav);
+
+        asset.safeTransferFrom(msg.sender, address(this), assets);
     }
 
     function redeem(uint256 shares) external nonReentrant returns (uint256 assets) {
-        // TODO
+        assets = previewRedeem(shares);
+        if (assets == 0) revert ZeroAmount();
+
+        _burn(msg.sender, shares);
+
+        uint256 available = asset.balanceOf(address(this));
+        if (available < assets) revert InsufficientLiquidity(available, assets);
+
+        // forge-lint: disable-next-line(reentrancy-events)
+        emit Redeemed(msg.sender, shares, assets, nav);
+
+        asset.safeTransfer(msg.sender, assets);
     }
 
     function setNav(uint256 newNav) external onlyRole(MANAGER_ROLE) {
-        // TODO
+        if (newNav == 0) revert InvalidNav();
+
+        uint256 oldNav = nav;
+        nav = newNav;
+        navUpdatedAt = block.timestamp;
+
+        emit NavUpdated(oldNav, newNav);
     }
 
+    /// @notice Shares minted for `assets`, rounded down so the fund never over-issues.
     function previewSubscribe(uint256 assets) public view returns (uint256) {
-        // TODO
+        return Math.mulDiv(assets, ONE_SHARE, nav);
     }
 
+    /// @notice Assets paid for `shares`, rounded down so the fund never over-pays.
     function previewRedeem(uint256 shares) public view returns (uint256) {
-        // TODO
+        return Math.mulDiv(shares, nav, ONE_SHARE);
     }
 
     // Every mint, burn and transfer goes through here.
