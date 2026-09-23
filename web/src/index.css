@@ -105,3 +105,27 @@ input {
 .tx.error {
   color: var(--error);
 }
+
+form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.stat span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.stat strong {
+  font-size: 1.15rem;
+}
