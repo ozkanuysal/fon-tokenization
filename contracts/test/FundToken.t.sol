@@ -223,6 +223,26 @@ contract FundTokenTest is Test {
         assertEq(fund.balanceOf(alice), 100e18);
     }
 
+    // fuzz
+
+    function testFuzz_RoundTripNeverPaysOutMoreThanPaidIn(uint256 assets, uint256 newNav) public {
+        assets = bound(assets, 1, 1e15); // up to 1B mUSDC
+        newNav = bound(newNav, 1, 1e12); // up to 1M mUSDC per share
+        _setNav(newNav);
+        vm.assume(fund.previewSubscribe(assets) > 0);
+
+        usdc.mint(alice, assets);
+        uint256 balanceBefore = usdc.balanceOf(alice);
+
+        uint256 shares = _subscribe(alice, assets);
+        vm.assume(fund.previewRedeem(shares) > 0);
+
+        vm.prank(alice);
+        fund.redeem(shares);
+
+        assertLe(usdc.balanceOf(alice), balanceBefore);
+    }
+
     // helpers
 
     function _subscribe(address investor, uint256 assets) internal returns (uint256 shares) {

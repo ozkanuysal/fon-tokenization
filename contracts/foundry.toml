@@ -12,3 +12,6 @@ remappings = [
 
 [fmt]
 line_length = 100
+
+[fuzz]
+runs = 1000
