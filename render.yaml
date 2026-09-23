@@ -1,0 +1,26 @@
+# Render blueprint for the indexer API.
+# Free web services sleep after 15 minutes without traffic. The SQLite file does not survive
+# that, which is fine: the indexer rebuilds it from START_BLOCK when the service wakes up.
+services:
+  - type: web
+    name: fund-indexer
+    runtime: docker
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /health
+    buildFilter:
+      paths:
+        - backend/**
+    envVars:
+      - key: RPC_URL
+        value: https://ethereum-sepolia-rpc.publicnode.com
+      - key: FUND_ADDRESS
+        value: "0x2e47C6787113D3aEb06B56A1fbC68Ef608b26CeA"
+      - key: REGISTRY_ADDRESS
+        value: "0x3dc5f9f4e47be65ECEf304e831413974cd28d8e2"
+      - key: START_BLOCK
+        value: "11764934"
+      # read-only public chain data, so any origin may read it
+      - key: CORS_ORIGINS
+        value: '["*"]'
