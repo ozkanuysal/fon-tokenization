@@ -12,6 +12,6 @@ contract MockUSDC is ERC20 {
     }
 
     function mint(address to, uint256 amount) external {
-        // TODO
+        _mint(to, amount);
     }
 }
