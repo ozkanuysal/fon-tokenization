@@ -37,7 +37,7 @@ export function TxStatus({ state, preflightError }: Props) {
   )
 }
 
-function TxLink({ hash }: { hash: Hash }) {
+export function TxLink({ hash }: { hash: Hash }) {
   if (!explorerUrl) return null
   return (
     <a href={`${explorerUrl}/tx/${hash}`} target="_blank" rel="noreferrer">
