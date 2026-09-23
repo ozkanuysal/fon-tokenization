@@ -98,9 +98,15 @@ contract FundToken is ERC20, AccessControl, ReentrancyGuard {
         return Math.mulDiv(shares, nav, ONE_SHARE);
     }
 
-    // Every mint, burn and transfer goes through here.
+    // Every mint, burn and transfer goes through here, so this is the only place the
+    // allowlist has to be enforced. address(0) is the mint/burn side and is skipped.
     function _update(address from, address to, uint256 value) internal override {
-        // TODO: both sides must be approved (zero address means mint/burn)
+        if (from != address(0)) _requireApproved(from);
+        if (to != address(0)) _requireApproved(to);
         super._update(from, to, value);
+    }
+
+    function _requireApproved(address account) private view {
+        if (!registry.isApproved(account)) revert NotApprovedInvestor(account);
     }
 }

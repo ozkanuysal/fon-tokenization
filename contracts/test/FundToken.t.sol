@@ -178,6 +178,51 @@ contract FundTokenTest is Test {
         _setNav(0);
     }
 
+    // transfer rules
+
+    function test_ApprovedInvestorsCanTransfer() public {
+        _subscribe(alice, 100e6);
+
+        vm.prank(alice);
+        fund.transfer(bob, 30e18);
+
+        assertEq(fund.balanceOf(alice), 70e18);
+        assertEq(fund.balanceOf(bob), 30e18);
+    }
+
+    function test_RevertWhen_UnapprovedInvestorSubscribes() public {
+        vm.startPrank(outsider);
+        usdc.approve(address(fund), 100e6);
+
+        vm.expectRevert(abi.encodeWithSelector(FundToken.NotApprovedInvestor.selector, outsider));
+        fund.subscribe(100e6);
+        vm.stopPrank();
+    }
+
+    function test_RevertWhen_TransferringToUnapprovedAddress() public {
+        _subscribe(alice, 100e6);
+
+        vm.expectRevert(abi.encodeWithSelector(FundToken.NotApprovedInvestor.selector, outsider));
+        vm.prank(alice);
+        fund.transfer(outsider, 10e18);
+    }
+
+    function test_RemovedInvestorIsFrozen() public {
+        _subscribe(alice, 100e6);
+        vm.prank(admin);
+        registry.remove(alice);
+
+        vm.startPrank(alice);
+        vm.expectRevert(abi.encodeWithSelector(FundToken.NotApprovedInvestor.selector, alice));
+        fund.transfer(bob, 10e18);
+
+        vm.expectRevert(abi.encodeWithSelector(FundToken.NotApprovedInvestor.selector, alice));
+        fund.redeem(10e18);
+        vm.stopPrank();
+
+        assertEq(fund.balanceOf(alice), 100e18);
+    }
+
     // helpers
 
     function _subscribe(address investor, uint256 assets) internal returns (uint256 shares) {
