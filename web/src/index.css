@@ -2,6 +2,12 @@
   font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
   color: #1f2328;
   background: #f6f8fa;
+  --border: #d0d7de;
+  --muted: #59636e;
+  --accent: #0969da;
+  --ok: #1a7f37;
+  --warn: #9a6700;
+  --error: #cf222e;
 }
 
 body {
@@ -11,5 +17,74 @@ body {
 main {
   max-width: 960px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 24px 16px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+h1 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+h2 {
+  font-size: 1.1rem;
+  margin: 0 0 12px;
+}
+
+section {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+nav {
+  display: flex;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+button {
+  font: inherit;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+
+button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+input {
+  font: inherit;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.wallet {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 0.9rem;
 }

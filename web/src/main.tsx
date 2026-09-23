@@ -6,7 +6,10 @@ import { config } from './config'
 import App from './App'
 import './index.css'
 
-const queryClient = new QueryClient()
+// Refresh on-chain reads every 15s so changes made from other wallets show up too.
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { refetchInterval: 15_000 } },
+})
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

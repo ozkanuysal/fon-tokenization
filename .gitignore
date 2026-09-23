@@ -225,6 +225,7 @@ contracts/broadcast/
 
 # Node
 node_modules/
+!web/src/lib/
 
 # SQLite
 *.db

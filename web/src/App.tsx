@@ -3,11 +3,14 @@ import { ConnectButton } from './components/ConnectButton'
 import { NetworkGuard } from './components/NetworkGuard'
 import { InvestorPanel } from './components/investor/InvestorPanel'
 import { ManagerPanel } from './components/manager/ManagerPanel'
+import { useIsManager } from './hooks/useIsManager'
 
 type Tab = 'investor' | 'manager'
 
 export default function App() {
   const [tab, setTab] = useState<Tab>('investor')
+  const isManager = useIsManager()
+  const activeTab = isManager ? tab : 'investor'
 
   return (
     <main>
@@ -17,17 +20,18 @@ export default function App() {
       </header>
 
       <NetworkGuard>
-        <nav>
-          <button onClick={() => setTab('investor')} disabled={tab === 'investor'}>
-            Yatırımcı
-          </button>
-          {/* TODO: show only to wallets with MANAGER_ROLE */}
-          <button onClick={() => setTab('manager')} disabled={tab === 'manager'}>
-            Yönetici
-          </button>
-        </nav>
+        {isManager && (
+          <nav>
+            <button onClick={() => setTab('investor')} disabled={activeTab === 'investor'}>
+              Yatırımcı
+            </button>
+            <button onClick={() => setTab('manager')} disabled={activeTab === 'manager'}>
+              Yönetici
+            </button>
+          </nav>
+        )}
 
-        {tab === 'investor' ? <InvestorPanel /> : <ManagerPanel />}
+        {activeTab === 'investor' ? <InvestorPanel /> : <ManagerPanel />}
       </NetworkGuard>
     </main>
   )
