@@ -26,18 +26,22 @@ contract InvestorRegistry is IInvestorRegistry, AccessControl {
     }
 
     function approve(address investor) external onlyRole(MANAGER_ROLE) {
-        // TODO
+        if (investor == address(0)) revert ZeroAddress();
+        if (!_investors.add(investor)) revert AlreadyApproved(investor);
+        emit InvestorApproved(investor);
     }
 
     function remove(address investor) external onlyRole(MANAGER_ROLE) {
-        // TODO
+        if (!_investors.remove(investor)) revert NotRegistered(investor);
+        emit InvestorRemoved(investor);
     }
 
     function isApproved(address account) external view returns (bool) {
-        // TODO
+        return _investors.contains(account);
     }
 
+    /// @notice Full list for the admin screen. Fine for a demo-sized list, not for thousands.
     function investors() external view returns (address[] memory) {
-        // TODO
+        return _investors.values();
     }
 }
