@@ -134,7 +134,7 @@ make test
 ```
 
 - Kontratlar: `cd contracts && forge test` ile 30 test, 1000 çalıştırmalı bir fuzz testi dahil. `forge coverage` üç kontratta satır, branch ve fonksiyon bazında %100.
-- Backend: `cd backend && uv run pytest` ile 22 test, lint için `uv run ruff check .`
+- Backend: `cd backend && uv run pytest` ile 23 test, lint için `uv run ruff check .`
 - Frontend: `cd web && pnpm install && pnpm lint && pnpm build`
 
 Tüm sistemi lokalde çalıştırmak için:

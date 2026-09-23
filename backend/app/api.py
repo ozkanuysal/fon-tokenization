@@ -5,6 +5,7 @@ from typing import Annotated, Literal
 
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 
 from app.indexer import Indexer
@@ -54,6 +55,10 @@ def create_app(
 
     app = FastAPI(title="Fund Indexer", lifespan=lifespan)
     app.add_middleware(CORSMiddleware, allow_origins=cors_origins, allow_methods=["GET"])
+
+    @app.get("/", include_in_schema=False)
+    def root() -> RedirectResponse:
+        return RedirectResponse("/docs")
 
     @app.get("/health")
     def health() -> Health:

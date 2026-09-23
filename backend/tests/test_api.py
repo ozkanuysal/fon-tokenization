@@ -69,3 +69,10 @@ def test_transactions_limit(client: TestClient, store: EventStore) -> None:
 @pytest.mark.parametrize("limit", [0, 201])
 def test_transactions_rejects_limit_out_of_range(client: TestClient, limit: int) -> None:
     assert client.get("/transactions", params={"limit": limit}).status_code == 422
+
+
+def test_root_redirects_to_docs(client: TestClient) -> None:
+    response = client.get("/", follow_redirects=False)
+
+    assert response.status_code == 307
+    assert response.headers["location"] == "/docs"
