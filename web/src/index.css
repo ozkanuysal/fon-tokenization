@@ -88,3 +88,20 @@ input {
   color: var(--muted);
   font-size: 0.9rem;
 }
+
+.tx {
+  margin: 8px 0 0;
+  font-size: 0.9rem;
+}
+
+.tx.pending {
+  color: var(--warn);
+}
+
+.tx.success {
+  color: var(--ok);
+}
+
+.tx.error {
+  color: var(--error);
+}
