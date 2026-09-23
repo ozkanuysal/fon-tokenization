@@ -14,7 +14,7 @@ contract Deploy is Script {
 
     uint256 constant INITIAL_NAV = 1e6; // 1.00 mUSDC
     uint256 constant DEMO_USDC = 10_000e6;
-    uint256 constant DEMO_GAS = 0.02 ether;
+    uint256 constant DEMO_GAS = 0.01 ether;
 
     function run() external {
         require(block.chainid == SEPOLIA || block.chainid == ANVIL, "Deploy: testnet only");
