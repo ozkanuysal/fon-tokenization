@@ -1,4 +1,4 @@
-.PHONY: build test fmt
+.PHONY: build test fmt abi
 
 build:
 	cd contracts && forge build
@@ -11,3 +11,7 @@ test:
 fmt:
 	cd contracts && forge fmt
 	cd backend && uv run ruff format .
+
+abi:
+	cd contracts && forge build
+	python3 scripts/export_abi.py
