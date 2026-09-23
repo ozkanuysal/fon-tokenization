@@ -129,3 +129,14 @@ form {
 .stat strong {
   font-size: 1.15rem;
 }
+
+h3 {
+  font-size: 1rem;
+  margin: 16px 0 8px;
+}
+
+.addresses {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.9rem;
+}

@@ -38,3 +38,7 @@ function parsePositive(input: string, decimals: number): bigint | undefined {
 export function shortAddress(address: string): string {
   return `${address.slice(0, 6)}...${address.slice(-4)}`
 }
+
+export function formatTimestamp(seconds: bigint | number): string {
+  return new Date(Number(seconds) * 1000).toLocaleString('tr-TR')
+}
