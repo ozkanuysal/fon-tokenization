@@ -68,32 +68,31 @@ scripts/       ABI'leri Foundry çıktısından backend ve frontend'e kopyalayan
 
 ## Varsayımlar ve gerekçeleri
 
-- Zincir olarak Sepolia'yı seçtim. MetaMask'te hazır geliyor, Etherscan'de verify standart ve EVM ekosistemi en geniş olanı. İzinli ağlar (Canton, Hyperledger vb.) gerçek fonlarda da kullanılıyor ama public testnet şartı ve araç desteği Sepolia'yı öne çıkardı.
-- Ödeme için bir test stablecoin'i (mUSDC) kullandım. Gerçek varlık kullanılamıyor. Fon payları gerçekte fiat veya stablecoin ile alınıyor; ETH gibi volatil bir varlık fiyatlamayı karıştırırdı.
-- İşlemler anında ve güncel NAV'dan gerçekleşiyor. Gerçek fonlarda emir bir sonraki NAV hesaplandığında gerçekleşir (ileri fiyatlama). Bunu POC için atladım, emir kuyruğu hem kontratı hem arayüzü iki katına çıkarırdı. Production karşılığı ERC-7540 benzeri bir talep/gerçekleştirme akışı.
-- NAV'ı yönetici elle giriyor. Oracle veya değişim limiti yok, tek kural 0 olamaması.
-- Nakit kontratta kalıyor. Girişlerden gelen mUSDC fonda duruyor, çıkışlar buradan ödeniyor. NAV artınca kasa tüm payları ödemeye yetmeyebilir; bu durumda çıkış `InsufficientLiquidity` hatası veriyor ve yönetici kasaya mUSDC ekleyebiliyor. Arayüz bu durumda uyarı gösteriyor.
-- Onayı kaldırılan yatırımcı donuyor. Payı cüzdanında kalıyor ama transfer de çıkış da yapamıyor. Kural tek: onaysız adres pay hareket ettiremez. Production'da buna zorla itfa eklenmeli.
-- Yuvarlama iki yönde de aşağı, yani fon lehine. Fuzz testi aynı NAV'da giriş-çıkış yapan kimsenin yatırdığından fazlasını alamadığını doğruluyor.
-- ERC-3643 ya da ERC-4626 yerine sade bir ERC-20 ve onay listesi kullandım. ERC-3643 izinli tokenlar için sektör standardı ama kimlik iddiaları ve uyum modülleriyle bu kapsam için ağır. ERC-4626 pay fiyatını kasadaki varlıktan hesapladığı için elle girilen NAV modeline uymuyor. Onay listesi bir arayüzün arkasında olduğu için ileride değiştirmek kolay.
-- Girişte önce pay basılıyor, sonra ödeme çekiliyor. Böylece onaysız yatırımcı harcama izni hatası yerine anlaşılır bir hata alıyor; ödeme başarısız olursa işlemin tamamı zaten geri alınıyor.
-- Backend var ama zorunlu değil. İşlem geçmişini tarayıcıdan zincire sormak (`eth_getLogs`) public RPC'lerde yavaş ve limitli. Küçük bir indexer bunu çözüyor; sadece okuduğu için güvenlik yüzeyi de küçük.
-- Değerlendirme için hazır demo cüzdanları kullandım. Herkesin kendi fonunu açtığı bir factory ya da yeni cüzdanlara gas dağıtan bir backend de düşündüm, ikisi de kapsamı büyütüyordu. Demo cüzdanlarında test ETH ve mUSDC hazır; private key'ler repoda değil, teslim e-postasında.
-- Hosting için ücretsiz planları kullandım. Frontend Vercel'de, backend Render'da. Render'ın ücretsiz planında servis bir süre istek almazsa uyuyor; ilk açılışta geçmiş paneli bir dakika kadar gecikebilir, uygulamanın geri kalanı etkilenmez.
+- Test ağı olarak Sepolia'yı seçtim. Gerçek para kullanılmıyor, MetaMask'te hazır geliyor ve kontrat kodunu Etherscan'de doğrulamak kolay.
+- Fona ödeme, test amaçlı bir dolar tokenıyla (mUSDC) yapılıyor. Gerçek fonlarda para ya da stablecoin kullanılır; ETH gibi fiyatı oynayan bir varlık hesabı karıştırırdı.
+- Fona giriş ve çıkış anında, o anki birim fiyattan (NAV) yapılıyor. Gerçek fonlarda emirler gün sonunda açıklanan fiyatla gerçekleşir; bu kuyruk yapısını POC için gereksiz buldum.
+- Birim fiyatı (NAV) yönetici elle giriyor. Tek kural fiyatın sıfır olamaması.
+- Yatırımcıların yatırdığı para fon kontratında duruyor ve çıkışlar oradan ödeniyor. Fiyat artıp kasa yetmezse çıkış hata veriyor, yönetici kasaya para ekleyebiliyor.
+- Onayı kaldırılan yatırımcının payı cüzdanında kalıyor ama donuyor: ne transfer edebiliyor ne de çıkış yapabiliyor.
+- Hesaplamalarda küsuratlar aşağı yuvarlanıyor. Böylece fon hiçbir zaman fazla pay vermiyor ya da fazla ödeme yapmıyor; bu otomatik testlerle de kontrol ediliyor.
+- İzinli tokenlar için sektörde daha kapsamlı standartlar var (örneğin ERC-3643). Bu POC için ağır bulduğum için sade bir token ve onaylı yatırımcı listesi kullandım. Liste ayrı bir kontratta olduğu için ileride değiştirilebilir.
+- Backend zorunlu değil, işlem ve NAV geçmişini hızlı göstermek için var. Zincirdeki kayıtları okuyup veritabanına yazıyor; özel anahtar tutmadığı ve zincire yazmadığı için risk taşımıyor.
+- Değerlendiriciler için hazır demo cüzdanları hazırladım. İçlerinde test ETH'si ve test doları var; anahtarlar repoda değil, teslim e-postasında.
+- Ücretsiz hosting kullandım: arayüz Vercel'de, backend Render'da. Render'ın ücretsiz planında servis bir süre kullanılmazsa uyuyor; ilk açılışta geçmiş paneli bir dakika kadar gecikebilir.
 
 ## Bilinçli olarak yapmadıklarım
 
-- İleri fiyatlama, emir kuyruğu ve cut-off saatleri
+- Gerçek fonlardaki gibi gün sonu fiyatıyla çalışan emir kuyruğu
 - Giriş, çıkış ve yönetim ücretleri
-- Oracle ile otomatik NAV
-- Gerçek KYC entegrasyonu; onay sadece adres listesi, kimlik verisi tutulmuyor
-- Tam ERC-3643 uyumu
-- Zorla transfer/itfa ve kayıp cüzdan kurtarma
-- Pause ve upgrade edilebilir (proxy) kontratlar
+- NAV'ın dış bir kaynaktan otomatik gelmesi; şu an yönetici giriyor
+- Gerçek kimlik doğrulaması (KYC); onay sadece bir adres listesi
+- Kapsamlı izinli token standardı (ERC-3643)
+- Yöneticinin payları zorla geri alabilmesi ve kaybolan cüzdanı kurtarma
+- Acil durumda sistemi durdurma ve kontratı sonradan güncelleyebilme
 - Birden fazla fon
-- Frontend için otomatik testler. Arayüzü lokal zincirde tarayıcıyla uçtan uca denedim ama bunu CI'a koymadım.
-- WalletConnect ve mobil cüzdan desteği, sadece tarayıcı eklentisi
-- Backend için kimlik doğrulama; zaten herkese açık olan zincir verisini sunuyor
+- Arayüz için otomatik testler; arayüzü tarayıcıda uçtan uca deneyerek kontrol ettim
+- Mobil cüzdan desteği; şu an sadece tarayıcı eklentisi (MetaMask vb.) destekleniyor
+- Backend için kullanıcı girişi; zaten herkese açık bilgiyi gösteriyor
 
 ## Production'a çıkmak için eksikler
 
