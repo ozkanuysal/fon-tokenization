@@ -1,27 +1,25 @@
+import type { Address } from 'viem'
 import { createConfig, http } from 'wagmi'
 import { foundry, sepolia } from 'wagmi/chains'
 import { injected } from 'wagmi/connectors'
+import localDeployment from '../../deployments/local.json'
+import sepoliaDeployment from '../../deployments/sepolia.json'
 
 type Deployment = {
   chainId: number
   startBlock: number
-  usdc: `0x${string}`
-  registry: `0x${string}`
-  fund: `0x${string}`
+  usdc: Address
+  registry: Address
+  fund: Address
 }
 
-const network = import.meta.env.VITE_NETWORK ?? 'sepolia'
+// VITE_NETWORK=local runs against the anvil chain from docker compose, anything else is Sepolia.
+const isLocal = import.meta.env.VITE_NETWORK === 'local'
 
-const deployments = import.meta.glob<Deployment>('../../deployments/*.json', {
-  eager: true,
-  import: 'default',
-})
+// Contract addresses written by contracts/script/Deploy.s.sol.
+export const deployment = (isLocal ? localDeployment : sepoliaDeployment) as Deployment
 
-const found = deployments[`../../deployments/${network}.json`]
-if (!found) throw new Error(`No deployment file for network "${network}"`)
-export const deployment = found
-
-export const chain = network === 'local' ? foundry : sepolia
+export const chain = isLocal ? foundry : sepolia
 
 const sepoliaRpc = import.meta.env.VITE_RPC_URL ?? 'https://ethereum-sepolia-rpc.publicnode.com'
 
