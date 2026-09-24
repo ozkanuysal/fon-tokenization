@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { isAddress } from 'viem'
-import { useReadContract, useSimulateContract } from 'wagmi'
+import { useSimulateContract } from 'wagmi'
 import { registry } from '../../contracts'
+import { useInvestors, useIsApproved } from '../../hooks/useFund'
 import { useTx } from '../../hooks/useTx'
 import { TxStatus } from '../TxStatus'
 
@@ -9,13 +10,8 @@ export function InvestorManager() {
   const [input, setInput] = useState('')
   const investor = isAddress(input) ? input : undefined
 
-  const { data: investors } = useReadContract({ ...registry, functionName: 'investors' })
-  const { data: approved } = useReadContract({
-    ...registry,
-    functionName: 'isApproved',
-    args: investor ? [investor] : undefined,
-    query: { enabled: Boolean(investor) },
-  })
+  const investors = useInvestors()
+  const approved = useIsApproved(investor)
 
   const approval = useSimulateContract({
     ...registry,

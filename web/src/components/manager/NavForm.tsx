@@ -1,14 +1,14 @@
 import { useState } from 'react'
-import { useReadContract, useSimulateContract } from 'wagmi'
+import { useSimulateContract } from 'wagmi'
 import { fund } from '../../contracts'
-import { useNav } from '../../hooks/useFund'
+import { useNav, useNavUpdatedAt } from '../../hooks/useFund'
 import { useTx } from '../../hooks/useTx'
 import { formatTimestamp, formatUsdc, parseUsdc } from '../../lib/format'
 import { TxStatus } from '../TxStatus'
 
 export function NavForm() {
   const nav = useNav()
-  const { data: updatedAt } = useReadContract({ ...fund, functionName: 'navUpdatedAt' })
+  const updatedAt = useNavUpdatedAt()
   const [input, setInput] = useState('')
   const newNav = parseUsdc(input)
 

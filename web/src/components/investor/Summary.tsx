@@ -1,6 +1,12 @@
-import { useConnection, useReadContract, useSimulateContract } from 'wagmi'
-import { fund, registry, TEST_USDC_AMOUNT, usdc } from '../../contracts'
-import { useNav, useShareBalance, useUsdcBalance } from '../../hooks/useFund'
+import { useConnection, useSimulateContract } from 'wagmi'
+import { TEST_USDC_AMOUNT, usdc } from '../../contracts'
+import {
+  useIsApproved,
+  useNav,
+  usePreviewRedeem,
+  useShareBalance,
+  useUsdcBalance,
+} from '../../hooks/useFund'
 import { useTx } from '../../hooks/useTx'
 import { formatShares, formatUsdc } from '../../lib/format'
 import { Stat } from '../Stat'
@@ -11,19 +17,8 @@ export function Summary() {
   const nav = useNav()
   const shares = useShareBalance(address)
   const usdcBalance = useUsdcBalance(address)
-
-  const { data: value } = useReadContract({
-    ...fund,
-    functionName: 'previewRedeem',
-    args: shares !== undefined ? [shares] : undefined,
-    query: { enabled: shares !== undefined },
-  })
-  const { data: approved } = useReadContract({
-    ...registry,
-    functionName: 'isApproved',
-    args: address ? [address] : undefined,
-    query: { enabled: Boolean(address) },
-  })
+  const value = usePreviewRedeem(shares)
+  const approved = useIsApproved(address)
 
   const faucet = useSimulateContract({
     ...usdc,

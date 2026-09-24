@@ -5,7 +5,7 @@ import { NetworkGuard } from './components/NetworkGuard'
 import { InvestorPanel } from './components/investor/InvestorPanel'
 import { ManagerPanel } from './components/manager/ManagerPanel'
 import { chain } from './config'
-import { useIsManager } from './hooks/useIsManager'
+import { useIsManager } from './hooks/useFund'
 
 type Tab = 'investor' | 'manager'
 

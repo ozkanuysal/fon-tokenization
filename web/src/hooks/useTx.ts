@@ -14,6 +14,7 @@ export type TxState =
 type Receipt = { error: Error | null; data?: { status: 'success' | 'reverted' } }
 
 // Sends a contract write and follows it until it is mined or fails.
+// Forms simulate the call first (useSimulateContract) and pass the prepared request to send().
 // All on-chain reads are refreshed once the transaction succeeds.
 export function useTx() {
   const queryClient = useQueryClient()

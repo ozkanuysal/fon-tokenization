@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { useConnection, useReadContract, useSimulateContract } from 'wagmi'
+import { useConnection, useSimulateContract } from 'wagmi'
 import { fund, usdc } from '../../contracts'
+import { useAllowance, usePreviewSubscribe } from '../../hooks/useFund'
 import { useTx } from '../../hooks/useTx'
 import { formatShares, parseUsdc } from '../../lib/format'
 import { TxStatus } from '../TxStatus'
@@ -11,18 +12,8 @@ export function SubscribeForm() {
   const [input, setInput] = useState('')
   const assets = parseUsdc(input)
 
-  const { data: allowance } = useReadContract({
-    ...usdc,
-    functionName: 'allowance',
-    args: address ? [address, fund.address] : undefined,
-    query: { enabled: Boolean(address) },
-  })
-  const { data: shares } = useReadContract({
-    ...fund,
-    functionName: 'previewSubscribe',
-    args: assets ? [assets] : undefined,
-    query: { enabled: Boolean(assets) },
-  })
+  const allowance = useAllowance(address)
+  const shares = usePreviewSubscribe(assets)
 
   const needsApproval = assets !== undefined && allowance !== undefined && allowance < assets
 

@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { formatUnits } from 'viem'
-import { useConnection, useReadContract, useSimulateContract } from 'wagmi'
+import { useConnection, useSimulateContract } from 'wagmi'
 import { fund } from '../../contracts'
-import { useShareBalance } from '../../hooks/useFund'
+import { usePreviewRedeem, useShareBalance } from '../../hooks/useFund'
 import { useTx } from '../../hooks/useTx'
 import { formatUsdc, parseShares, SHARE_DECIMALS } from '../../lib/format'
 import { TxStatus } from '../TxStatus'
@@ -13,12 +13,7 @@ export function RedeemForm() {
   const [input, setInput] = useState('')
   const shares = parseShares(input)
 
-  const { data: assets } = useReadContract({
-    ...fund,
-    functionName: 'previewRedeem',
-    args: shares ? [shares] : undefined,
-    query: { enabled: Boolean(shares) },
-  })
+  const assets = usePreviewRedeem(shares)
   const redemption = useSimulateContract({
     ...fund,
     functionName: 'redeem',

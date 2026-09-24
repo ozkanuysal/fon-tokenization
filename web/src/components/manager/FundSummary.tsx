@@ -1,6 +1,6 @@
-import { useReadContract, useSimulateContract } from 'wagmi'
+import { useSimulateContract } from 'wagmi'
 import { fund, TEST_USDC_AMOUNT, usdc } from '../../contracts'
-import { useNav, useUsdcBalance } from '../../hooks/useFund'
+import { useNav, usePreviewRedeem, useTotalShares, useUsdcBalance } from '../../hooks/useFund'
 import { useTx } from '../../hooks/useTx'
 import { formatShares, formatUsdc } from '../../lib/format'
 import { Stat } from '../Stat'
@@ -9,13 +9,8 @@ import { TxStatus } from '../TxStatus'
 export function FundSummary() {
   const nav = useNav()
   const cash = useUsdcBalance(fund.address)
-  const { data: totalShares } = useReadContract({ ...fund, functionName: 'totalSupply' })
-  const { data: sharesValue } = useReadContract({
-    ...fund,
-    functionName: 'previewRedeem',
-    args: totalShares !== undefined ? [totalShares] : undefined,
-    query: { enabled: totalShares !== undefined },
-  })
+  const totalShares = useTotalShares()
+  const sharesValue = usePreviewRedeem(totalShares)
 
   // Test money straight into the fund, so redemptions can be paid after a NAV increase.
   const topUp = useSimulateContract({
