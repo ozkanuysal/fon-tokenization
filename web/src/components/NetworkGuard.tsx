@@ -7,7 +7,17 @@ export function NetworkGuard({ children }: { children: ReactNode }) {
   const switchChain = useSwitchChain()
 
   if (!isConnected) {
-    return <p className="hint">Devam etmek için cüzdanınızı bağlayın.</p>
+    return (
+      <section className="welcome">
+        <h2>Hoş geldiniz</h2>
+        <p>
+          Bu uygulama bir yatırım fonunun paylarını {chain.name} test ağında token olarak tutar.
+          Yatırımcı olarak fona girip çıkabilir, yönetici olarak NAV'ı güncelleyip yatırımcıları
+          onaylayabilirsiniz.
+        </p>
+        <p className="hint">Başlamak için sağ üstten cüzdanınızı bağlayın.</p>
+      </section>
+    )
   }
 
   if (chainId !== chain.id) {

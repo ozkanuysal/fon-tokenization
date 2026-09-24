@@ -7,8 +7,10 @@ export function ManagerPanel() {
   return (
     <>
       <FundSummary />
-      <NavForm />
-      <NavHistory />
+      <div className="grid-2">
+        <NavForm />
+        <NavHistory />
+      </div>
       <InvestorManager />
     </>
   )

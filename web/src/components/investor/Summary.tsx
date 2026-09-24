@@ -41,7 +41,14 @@ export function Summary() {
         <Stat label="Payım" value={formatShares(shares)} />
         <Stat label="Payımın değeri" value={`${formatUsdc(value)} mUSDC`} />
         <Stat label="mUSDC bakiyem" value={formatUsdc(usdcBalance)} />
-        <Stat label="Durum" value={approved ? 'Onaylı yatırımcı' : 'Onaysız'} />
+        <Stat
+          label="Durum"
+          value={
+            <span className={approved ? 'badge ok' : 'badge warn'}>
+              {approved ? 'Onaylı yatırımcı' : 'Onaysız'}
+            </span>
+          }
+        />
       </div>
       {approved === false && (
         <p className="hint">Fona girebilmek için yöneticinin adresinizi onaylaması gerekiyor.</p>

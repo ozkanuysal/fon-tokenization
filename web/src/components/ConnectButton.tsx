@@ -26,7 +26,7 @@ export function ConnectButton() {
       >
         {connect.isPending ? 'Bağlanıyor...' : 'Cüzdan bağla'}
       </button>
-      {connect.error && <span className="tx error">{toMessage(connect.error)}</span>}
+      {connect.error && <span className="connect-error">{toMessage(connect.error)}</span>}
     </div>
   )
 }

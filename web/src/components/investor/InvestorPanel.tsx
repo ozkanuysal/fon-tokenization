@@ -8,8 +8,10 @@ export function InvestorPanel() {
   return (
     <>
       <Summary />
-      <SubscribeForm />
-      <RedeemForm />
+      <div className="grid-2">
+        <SubscribeForm />
+        <RedeemForm />
+      </div>
       <TransferForm />
       <History />
     </>
