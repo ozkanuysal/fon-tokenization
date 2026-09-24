@@ -1,4 +1,5 @@
 import { useConnect, useConnection, useConnectors, useDisconnect } from 'wagmi'
+import { toMessage } from '../lib/errors'
 import { shortAddress } from '../lib/format'
 
 export function ConnectButton() {
@@ -25,7 +26,7 @@ export function ConnectButton() {
       >
         {connect.isPending ? 'Bağlanıyor...' : 'Cüzdan bağla'}
       </button>
-      {connect.error && <span className="tx error">MetaMask gibi bir tarayıcı cüzdanı gerekli.</span>}
+      {connect.error && <span className="tx error">{toMessage(connect.error)}</span>}
     </div>
   )
 }

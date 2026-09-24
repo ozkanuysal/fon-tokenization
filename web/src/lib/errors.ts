@@ -1,4 +1,9 @@
-import { BaseError, ContractFunctionRevertedError, UserRejectedRequestError } from 'viem'
+import {
+  BaseError,
+  ContractFunctionRevertedError,
+  ResourceUnavailableRpcError,
+  UserRejectedRequestError,
+} from 'viem'
 
 // Custom errors of our contracts (and the OpenZeppelin ones they inherit), by name.
 const contractErrors: Record<string, string> = {
@@ -15,10 +20,19 @@ const contractErrors: Record<string, string> = {
 }
 
 export function toMessage(error: unknown): string {
-  if (!(error instanceof BaseError)) return 'Beklenmeyen bir hata oluştu.'
+  if (!(error instanceof BaseError)) {
+    // wagmi throws this when the browser has no injected wallet at all
+    if (error instanceof Error && error.name === 'ProviderNotFoundError') {
+      return 'Tarayıcıda MetaMask gibi bir cüzdan bulunamadı.'
+    }
+    return 'Beklenmeyen bir hata oluştu.'
+  }
 
   if (error.walk((e) => e instanceof UserRejectedRequestError)) {
-    return 'İşlemi cüzdanda reddettiniz.'
+    return 'İsteği cüzdanda reddettiniz.'
+  }
+  if (error.walk((e) => e instanceof ResourceUnavailableRpcError)) {
+    return 'Cüzdanda bekleyen bir istek var, MetaMask penceresini açıp tamamlayın.'
   }
 
   const revert = error.walk((e) => e instanceof ContractFunctionRevertedError)
