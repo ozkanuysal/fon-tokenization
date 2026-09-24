@@ -12,7 +12,7 @@ export function ConnectButton() {
     return (
       <div className="wallet">
         <code>{shortAddress(address)}</code>
-        <button onClick={() => disconnect.mutate()}>Çıkış</button>
+        <button onClick={() => disconnect.mutate()}>Bağlantıyı kes</button>
       </div>
     )
   }
